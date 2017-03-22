@@ -8,4 +8,4 @@ File Contents
 - DDL to create the database
 - DML to populate the database with fake info.
 - Queries has several queries to run against the database.
-- UML diagram and relation scheme show what they describe.
+- UML diagram and relation scheme are also included.

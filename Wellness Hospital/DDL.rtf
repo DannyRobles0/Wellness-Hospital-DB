@@ -1,0 +1,286 @@
+{\rtf1\ansi\ansicpg1252\deff0\deflang1033{\fonttbl{\f0\fnil\fcharset0 Calibri;}}
+{\*\generator Msftedit 5.41.21.2510;}\viewkind4\uc1\pard\sl276\slmult1\lang9\f0\fs22 create table EveryoneInHospital\par
+(\par
+    IDNumber char(3) NOT Null,\par
+    fName varchar(15) not null,\par
+    lName varchar(15) not null,\par
+    PhoneNumber varchar(12),\par
+    street varchar(20),\par
+    birthday date,\par
+    zipcode char(5),\par
+    constraint pk_everyone primary key(IDNumber)\par
+);\par
+\par
+create table Contract\par
+(\par
+    IDNumber char(3) not null,\par
+    startDate date not null,\par
+    endDate date,\par
+    constraint pk_contract primary key(IDNumber),\par
+    constraint fk_contract foreign key(IDNumber) \par
+        references EveryoneInHospital(IDNumber)\par
+);\par
+\par
+create table Physicians\par
+(\par
+    IDNumber char(3) not null,\par
+    specialty varchar(15) not null,\par
+    DocPageNum varchar(12) not null,\par
+    constraint pk_physicians primary key(DocPageNum),\par
+    constraint fk_physicians_contract foreign key(IDNumber)\par
+        references Contract(IDNumber)\par
+);\par
+\par
+create table zipLocation\par
+(\par
+    zipcode char(5) not null,\par
+    city varchar(15) not null,\par
+    state varchar(15) not null,\par
+    constraint pk_zip primary key(zipcode)\par
+);\par
+\par
+alter table EveryoneInHospital\par
+    add constraint fk_everyone_zip\par
+    foreign key(zipcode)\par
+    references zipLocation(zipcode);\par
+\par
+create table  Patients\par
+(\par
+    DocPageNum varchar(12) not null,\par
+    IDNumber char(3) not null,\par
+    contactDate date not null,\par
+    constraint pk_patients primary key(IDNumber),\par
+    constraint fk_everyone_patients foreign key(IDNumber)\par
+        references EveryoneInHospital(IDNumber),\par
+    constraint fk_physicians_patients foreign key(DocPageNum)\par
+        references Physicians(DocPageNum)\par
+);\par
+\par
+create table EmergencyContact\par
+(\par
+    IDNumber char(3) not null,\par
+    fName varchar(15) not null,\par
+    lName varchar(15) not null,\par
+    phoneNumber varchar(12) not null,\par
+    constraint fk_patients_emergency foreign key(IDNumber)\par
+        references patients(IDNumber)\par
+);\par
+\par
+create table outPatients\par
+(\par
+    IDNumber char(3) not null,\par
+    visitDate date not null,\par
+    constraint pk_outP primary key(IDNumber, visitDate),\par
+    constraint fk_outP_patients foreign key(IDNumber)\par
+        references Patients(IDNumber)\par
+);\par
+\par
+create table visit\par
+(\par
+    IDNumber char(3) not null,\par
+    DocPageNum varchar(12) not null,\par
+    visitDate date not null,\par
+    visitTime time not null,\par
+    comments varchar(30),\par
+    constraint fk_visit_Physician foreign key(DocPageNum)\par
+        references Physicians(DocPageNum),\par
+    constraint fk_visit_outP foreign key(IDNumber, visitDate)\par
+        references outPatients(IDNumber, visitDate)\par
+);\par
+\par
+create table resident\par
+(\par
+    IDNumber char(3) not null,\par
+    Meal varchar(10) not null,\par
+    bedNumber smallint not null,\par
+    admitDate date not null,\par
+    constraint fk_resident_patient foreign key(IDNumber)\par
+        references patients(IDNumber)\par
+);\par
+\par
+create table meals\par
+(  \par
+    meal varchar(10) not null,\par
+    constraint pk_meals primary key(meal)\par
+);\par
+\par
+create table Beds\par
+(\par
+    careName varchar(15) not null,\par
+    bedNumber smallint not null,\par
+    roomNumber smallint not null,\par
+    constraint pk_beds primary key(bedNumber)\par
+);\par
+\par
+create table CareCenter\par
+(\par
+    IDNumber char(3) not null,\par
+    careName varChar(15) not null,\par
+    Location varChar(15) not null,\par
+    constraint pk_cc primary key(careName)\par
+);\par
+\par
+create table CareNames\par
+(\par
+    careName varchar(15) not null,\par
+    constraint pk_CN primary key(careName)\par
+);\par
+\par
+alter table carecenter\par
+    add constraint fk_cc_cn foreign key(careName)\par
+    references careNames(careName);\par
+\par
+alter table beds\par
+add constraint fk_cc_beds foreign key(careName)\par
+references carecenter(careName);\par
+\par
+alter table resident\par
+add constraint fk_resident_beds foreign key(bedNumber)\par
+references beds(bedNumber);\par
+\par
+create table Employees\par
+(\par
+    IDNumber char(3) not null,\par
+    HireDate date not null,\par
+    constraint pk_emp primary key(IDNumber),\par
+    constraint fk_emp_contract foreign key(IDNumber)\par
+        references contract(IDNumber)\par
+);\par
+\par
+create table staff\par
+(\par
+    IDNumber char(3) not null,\par
+    JobClass varchar(15),\par
+    constraint fk_staff_emp foreign key(IDNumber)\par
+        references employees(IDNumber)\par
+);\par
+\par
+create table JobClasses\par
+(\par
+    JobClass varchar(15) not null,\par
+    constraint pk_job primary key(JobClass)\par
+);\par
+\par
+alter table staff\par
+add constraint fk_job_staff foreign key(JobClass)\par
+    references JobClasses(JobClass);\par
+\par
+create table Technicians\par
+(\par
+    IDNumber char(3) not null,\par
+    constraint pk_technicians primary key(IDNumber),\par
+    constraint fk_emp_techs foreign key(IDNumber)\par
+        references Employees(IDNumber)\par
+);\par
+\par
+create table TechLab\par
+(\par
+    IDNumber char(3) not null,\par
+    labName varchar(15) not null,\par
+    constraint fk_tech_lab foreign key(IDNumber)\par
+        references Technicians(IDNumber)\par
+);\par
+\par
+create table laboratory\par
+(\par
+    labName varchar(15) not null,\par
+    location varchar(15) not null,\par
+    constraint pk_lab primary key(labName)\par
+);\par
+\par
+alter table techlab\par
+add constraint fk_lab_tech foreign key(labName)\par
+references laboratory(labName);\par
+\par
+create table labNames\par
+(\par
+    labName varchar(15) not null,\par
+    constraint pk_labnames primary key(labName)\par
+);\par
+\par
+alter table laboratory\par
+add constraint fk_labnames foreign key (labname)\par
+references labnames(labname);\par
+\par
+create table techSkills\par
+(\par
+    IDNumber char(3) not null,\par
+    skill varchar(15),\par
+    constraint fk_tech_skill foreign key(IDNumber)\par
+        references technicians(IDNumber)\par
+);\par
+\par
+create table tSkills\par
+(\par
+    skill varchar(15) not null,\par
+    constraint pk_tSkill primary key(skill)\par
+);\par
+\par
+alter table techSkills\par
+add constraint fk_tskill_techSkill foreign key(skill)\par
+references tskills(skill);\par
+\par
+create table nurse\par
+(\par
+    IDNumber char(3) not null,\par
+    certificate varchar(15) not null,\par
+    hoursWorked smallint,\par
+    careName varchar(15) not null,\par
+    constraint pk_nurse primary key(IDNumber),\par
+    constraint fk_nurse_emp foreign key(IDNumber)\par
+        references employees(IDNumber),\par
+    constraint fk_nurse_cc foreign key(careName)\par
+        references CareCenter(careName)\par
+);\par
+\par
+create table certificates\par
+(\par
+    certificate varchar(15) not null,\par
+    constraint pk_cert primary key(certificate)\par
+);\par
+\par
+alter table nurse\par
+add constraint fk_nurse_cert foreign key(certificate)\par
+references certificates(certificate);\par
+\par
+create table RegisteredNurse\par
+(\par
+    IDNumber char(3) not null,\par
+    licenseNumber smallint not null,\par
+    constraint pk_RN primary key(IDNumber),\par
+    constraint fk_RN_nurse foreign key(IDNumber)\par
+        references nurse(IDNumber)\par
+);\par
+\par
+alter table carecenter\par
+add constraint fk_cc_RN foreign key(IDNumber)\par
+   references registeredNurse(IDNumber);\par
+\par
+create table volunteers\par
+(\par
+    IDNumber char(3) not null,\par
+    hoursWorked smallint not null,\par
+    constraint pk_volunteers primary key(IDNumber),\par
+    constraint fk_contract_volunteers foreign key(IDNumber)\par
+        references contract(IDNumber)\par
+);\par
+\par
+create table volunteerSkills\par
+(\par
+    IDNumber char(3) not null,\par
+    skill varchar(15),\par
+    constraint fk_vs_v foreign key(IDNumber)\par
+        references volunteers(IDNumber)\par
+);\par
+\par
+create table vSkills\par
+(\par
+    skill varchar(15) not null,\par
+    constraint pk_vskill primary key(skill)\par
+);\par
+\par
+alter table volunteerSkills\par
+add constraint fk_volunteer_skills foreign key(skill)\par
+references vskills(skill); \par
+}
+ 
